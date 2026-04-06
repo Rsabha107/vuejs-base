@@ -1,0 +1,23 @@
+@import 'primeicons/primeicons.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.login-bg {
+  background: 
+    /* linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), */
+    url('/assets/img/background/P1-P2_1920x1080_pxl.png');
+  background-size: cover;
+  /* background-position: center; */
+  background-repeat: no-repeat;
+}
+
+.none-login-bg {
+  background: 
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url('/assets/img/background/wo_logo/P3-P4-P5-P6_1920x1080_pxl.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

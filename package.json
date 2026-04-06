@@ -1,0 +1,40 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@inertiajs/vue3": "^2.3.18",
+        "@tailwindcss/forms": "^0.5.3",
+        "@tailwindcss/vite": "^4.0.0",
+        "@vitejs/plugin-vue": "^6.0.0",
+        "autoprefixer": "^10.4.12",
+        "axios": "^1.14.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^3.0.0",
+        "postcss": "^8.4.31",
+        "tailwindcss": "^3.2.1",
+        "vite": "^8.0.0",
+        "vue": "^3.4.0"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^7.2.0",
+        "@popperjs/core": "^2.11.8",
+        "@primeuix/themes": "^2.0.3",
+        "@primevue/themes": "^4.5.4",
+        "@wave-frontend/wave-js": "^1.1.0",
+        "apexcharts": "^5.10.4",
+        "bootstrap": "^5.3.8",
+        "bootstrap-table": "^1.27.0",
+        "jquery": "^4.0.0",
+        "node-waves": "^0.7.6",
+        "primeicons": "^7.0.0",
+        "primevue": "^4.5.4",
+        "sweetalert2": "^11.26.24",
+        "toastr": "^2.1.4",
+        "wave-ui": "^3.25.6"
+    }
+}
