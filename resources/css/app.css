@@ -1,23 +1,133 @@
-@import 'primeicons/primeicons.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 .login-bg {
-  background: 
-    /* linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), */
+  background:
     url('/assets/img/background/P1-P2_1920x1080_pxl.png');
   background-size: cover;
-  /* background-position: center; */
   background-repeat: no-repeat;
 }
 
 .none-login-bg {
-  background: 
+  background:
     linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
     url('/assets/img/background/wo_logo/P3-P4-P5-P6_1920x1080_pxl.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+/* =========================
+   Roles Table Styling
+========================= */
+
+.roles-table-wrapper .roles-table-card {
+    background: #fff;
+    border: 1px solid #e9edf5;
+    border-radius: 18px;
+    padding: 1rem;
+}
+
+.roles-table-wrapper .fixed-table-toolbar .btn,
+.roles-table-wrapper .fixed-table-toolbar .form-control,
+.roles-table-wrapper .table-toolbar .btn,
+.roles-table-wrapper .table-toolbar .form-control {
+    min-height: 42px;
+}
+
+.roles-table-wrapper .bootstrap-table .fixed-table-container {
+    border: 1px solid #e9edf5 !important;
+    border-radius: 18px !important;
+    overflow: hidden;
+    background: #fff;
+}
+
+.roles-table-wrapper .bootstrap-table .fixed-table-header {
+    background: #f8fafc;
+}
+
+.roles-table-wrapper .bootstrap-table .fixed-table-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.roles-table-wrapper .bootstrap-table .table {
+    margin-bottom: 0 !important;
+}
+
+.roles-table-wrapper .bootstrap-table .table thead th {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e9edf5 !important;
+    color: #344054 !important;
+    font-weight: 600;
+    vertical-align: middle;
+    white-space: nowrap;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.roles-table-wrapper .bootstrap-table .table tbody td {
+    border-color: #edf1f7;
+    vertical-align: middle;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.roles-table-wrapper .bootstrap-table .filter-control,
+.roles-table-wrapper .bootstrap-table select.form-control,
+.roles-table-wrapper .bootstrap-table input.form-control {
+    border: 1px solid #dbe3ef !important;
+    border-radius: 10px !important;
+    min-height: 36px;
+    font-size: 13px;
+    background-color: #fff !important;
+    box-shadow: none !important;
+}
+
+.roles-table-wrapper .bootstrap-table .table-hover tbody tr:hover {
+    background-color: #f9fbff;
+}
+
+.roles-table-wrapper .page-item.active .page-link {
+    border-radius: 10px;
+}
+
+.roles-table-wrapper .pagination-detail,
+.roles-table-wrapper .pagination {
+    margin-top: 12px;
+}
+
+.roles-table-wrapper .badge.rounded-pill {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.roles-table-wrapper .table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.roles-table-wrapper .table-toolbar .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.roles-table-wrapper .table-toolbar .search-input {
+    width: 260px;
+}
+
+.roles-table-wrapper .action-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }

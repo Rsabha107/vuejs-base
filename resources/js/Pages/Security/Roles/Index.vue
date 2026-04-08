@@ -38,6 +38,7 @@ defineProps({
           <div class="card">
             <div class="card-body">
               <h4 class="mb-3">Roles</h4>
+
               <RoleBtTable :rows="roles" />
             </div>
           </div>

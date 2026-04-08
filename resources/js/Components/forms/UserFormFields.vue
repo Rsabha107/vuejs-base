@@ -16,7 +16,6 @@ const props = defineProps({
 </script>
 
 <template>
-  <>
     <div class="mb-3">
       <label class="form-label">Name</label>
       <input v-model="form.name" type="text" class="form-control" />
@@ -62,5 +61,4 @@ const props = defineProps({
         {{ form.errors.status_id }}
       </div>
     </div>
-  </>
 </template>

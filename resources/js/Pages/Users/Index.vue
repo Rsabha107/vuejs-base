@@ -3,7 +3,7 @@ import { Head } from "@inertiajs/vue3";
 import { onMounted, onUnmounted } from "vue";
 import HeaderNavbar from "@/Components/HeaderNavbar.vue";
 import VerticalMenu from "@/Components/VerticalMenu.vue";
-import UsersBtTable from "@/Components/UsersBtTable.vue";
+import UsersBtTable from "@/Components/user/UsersBtTable.vue";
 
 // onMounted(() => {
 //   console.log("Users Index Page Mounted");

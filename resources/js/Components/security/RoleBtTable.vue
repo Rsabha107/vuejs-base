@@ -11,6 +11,20 @@ import $ from "jquery";
 
 const tableRef = ref(null);
 
+function actionFormatter(value, row) {
+  return `
+            <div class="d-flex justify-content-center gap-1">
+              <button class="btn btn-sm btn-outline-warning edit-btn" data-id="${row.id}">
+                <i class="fa fa-edit"></i>
+              </button>
+
+              <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${row.id}" data-name="${row.name}">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          `;
+}
+
 function initTable() {
   if (!tableRef.value) return;
 
@@ -26,11 +40,13 @@ function initTable() {
   $table.bootstrapTable({
     url: "/api/roles",
     method: "get",
+    toolbar: "#toolbar",
     pagination: true,
     sidePagination: "server",
     search: true,
     showRefresh: true,
     height: 600,
+    filterControl: true,
     showColumns: true,
     sortName: "id", // default sort column
     sortOrder: "asc", // default direction
@@ -45,6 +61,9 @@ function initTable() {
         search: params.search,
         sort: params.sort,
         order: params.order,
+
+        filter_id: $(".bootstrap-table-filter-control-id").val(),
+        filter_name: $(".bootstrap-table-filter-control-name").val(),
       };
     },
     loadingTemplate: function () {
@@ -63,10 +82,27 @@ function initTable() {
         align: "center",
         width: "5%",
         visible: false,
+        filterControl: "input",
       },
-      { field: "name", title: "Name" },
-      { field: "created_at", title: "Created At" },
-      { field: "updated_at", title: "Updated At" },
+      { field: "name", title: "Name", sortable: true, filterControl: "input" },
+      {
+        field: "created_at",
+        title: "Created At",
+        sortable: true,
+        filterControl: "input",
+      },
+      {
+        field: "updated_at",
+        title: "Updated At",
+        sortable: true,
+        filterControl: "input",
+      },
+      {
+        field: "actions",
+        title: "Actions",
+        formatter: actionFormatter,
+        events: window.roleEvents,
+      },
     ],
   });
 
@@ -104,5 +140,18 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <table ref="tableRef" class="table table-bordered table-hover"></table>
+  <div class="roles-table-wrapper">
+    <div class="roles-table-card">
+      <div id="toolbar">
+        <button id="remove" class="btn btn-danger" disabled>
+          <i class="fa fa-trash"></i> Delete
+        </button>
+        
+      </div>
+
+      <div class="roles-table-wrapper">
+        <table ref="tableRef"></table>
+      </div>
+    </div>
+  </div>
 </template>

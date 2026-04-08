@@ -1,0 +1,1 @@
+import{$ as e,C as t,E as n,I as r,Y as i,k as a}from"./app-BW33wAw2.js";var o={__name:`AuthFooter`,setup(o){let s=new Date().getFullYear();return(o,c)=>(r(),n(`p`,null,[a(` RS© `+e(i(s))+` Skote. Crafted with `,1),c[0]||=t(`i`,{class:`mdi mdi-heart text-danger`},null,-1),c[1]||=a(` by Themesbrand `,-1)]))}};export{o as t};

@@ -110,7 +110,7 @@ class UserController extends Controller
 
     public function index()
     {
-       // $users = User::select('id', 'name', 'email', 'status_id', 'created_at')->with('status')->orderBy('id', 'desc')->get();
+        // $users = User::select('id', 'name', 'email', 'status_id', 'created_at')->with('status')->orderBy('id', 'desc')->get();
 
         $users = User::with('status')
             ->orderBy('id', 'desc')
@@ -128,7 +128,7 @@ class UserController extends Controller
                 ];
             });
 
-        Log::info('Fetched users for index', json_decode($users->toJson(), true));
+        // Log::info('Fetched users for index', json_decode($users->toJson(), true));
 
         return Inertia::render('Users/Index', [
             'users' => $users,
@@ -145,6 +145,12 @@ class UserController extends Controller
 
     public function table(Request $request)
     {
+        Log::info('users.table request', [
+            'sort_field' => $request->input('sort_field'),
+            'sort_order' => $request->input('sort_order'),
+            'all' => $request->all(),
+        ]);
+
         $perPage = (int) $request->input('per_page', 10);
         $page = (int) $request->input('page', 1);
 
@@ -161,46 +167,47 @@ class UserController extends Controller
         // ]);
 
         $query = User::query()
-    ->leftJoin('global_statuses', 'users.status_id', '=', 'global_statuses.id')
-    ->select([
-        'users.id',
-        'users.name',
-        'users.email',
-        'users.status_id',
-        'global_statuses.name as status_name',
-        'global_statuses.color as status_color',
-    ]);
+            ->leftJoin('global_statuses', 'users.status_id', '=', 'global_statuses.id')
+            ->select([
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.status_id',
+                'global_statuses.name as status_name',
+                'global_statuses.color as status_color',
+            ]);
 
         // 🔍 Global search
         $global = data_get($filters, 'global.value');
         if (!empty($global)) {
-            $query->where(function ($q) use ($global) {
-                $q->where('id', 'like', "%{$global}%")
-                    ->orWhere('name', 'like', "%{$global}%")
-                    ->orWhere('email', 'like', "%{$global}%")
-                    ->orWhere('status_id', 'like', "%{$global}%");
-            });
+$query->where(function ($q) use ($global) {
+    $q->where('users.id', 'like', "%{$global}%")
+      ->orWhere('users.name', 'like', "%{$global}%")
+      ->orWhere('users.email', 'like', "%{$global}%")
+      ->orWhere('users.status_id', 'like', "%{$global}%")
+      ->orWhere('global_statuses.name', 'like', "%{$global}%");
+});
         }
 
         // 📌 Column filters
         if ($name = data_get($filters, 'name.constraints.0.value')) {
-            $query->where('name', 'like', "%{$name}%");
+            $query->where('users.name', 'like', "%{$name}%");
         }
 
         if ($email = data_get($filters, 'email.constraints.0.value')) {
-            $query->where('email', 'like', "%{$email}%");
+            $query->where('users.email', 'like', "%{$email}%");
         }
 
         $statusFilter = data_get($filters, 'status.constraints.0.value');
         if (is_array($statusFilter) && count($statusFilter)) {
-            $query->whereIn('status_id', $statusFilter);
+            $query->whereIn('users.status_id', $statusFilter);
         }
 
         // 🛡️ Safe sorting
-        $allowedSorts = ['id', 'name', 'email', 'status_id'];
+        $allowedSorts = ['users.id', 'users.name', 'users.email', 'users.status_id'];
 
         if (!in_array($sortField, $allowedSorts)) {
-            $sortField = 'id';
+            $sortField = 'users.id';
         }
 
         $query->orderBy($sortField, $sortOrder);
