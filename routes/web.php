@@ -62,8 +62,11 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::controller(RoleController::class)->group(function () {
-        Route::get('/roles', 'index')->name('roles.index'); // Inertia page
-        Route::get('/api/roles', 'data')->name('roles.data'); // AJAX data endpoint
+        Route::get('/roles', 'index')->name('roles.index');
+        Route::get('/api/roles', 'data')->name('roles.data');
+        Route::post('/roles', 'store')->name('roles.store');
+        Route::put('/roles/{role}', 'update')->name('roles.update');
+        Route::delete('/roles/{role}', 'destroy')->name('roles.destroy');
     });
 
     Route::inertia('mypage', 'Mypage')->name('mypage');

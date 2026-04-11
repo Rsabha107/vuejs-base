@@ -198,17 +198,22 @@ $query->where(function ($q) use ($global) {
             $query->where('users.email', 'like', "%{$email}%");
         }
 
-        $statusFilter = data_get($filters, 'status.constraints.0.value');
+        $statusFilter = data_get($filters, 'status_id.constraints.0.value');
         if (is_array($statusFilter) && count($statusFilter)) {
             $query->whereIn('users.status_id', $statusFilter);
+        } elseif ($statusFilter !== null && $statusFilter !== '') {
+            $query->where('users.status_id', $statusFilter);
         }
 
-        // 🛡️ Safe sorting
-        $allowedSorts = ['users.id', 'users.name', 'users.email', 'users.status_id'];
+        // 🛡️ Safe sorting — map frontend field names to qualified column names
+        $sortFieldMap = [
+            'id'        => 'users.id',
+            'name'      => 'users.name',
+            'email'     => 'users.email',
+            'status_id' => 'users.status_id',
+        ];
 
-        if (!in_array($sortField, $allowedSorts)) {
-            $sortField = 'users.id';
-        }
+        $sortField = $sortFieldMap[$sortField] ?? 'users.id';
 
         $query->orderBy($sortField, $sortOrder);
 

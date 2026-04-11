@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -17,6 +16,41 @@ class RoleController extends Controller
         // $roles = Role::select('id', 'name', 'created_at', 'updated_at')->get();
 
         return Inertia::render('Security/Roles/Index');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name',
+        ]);
+
+        $role = Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
+
+        return response()->json([
+            'message' => 'Role created successfully',
+            'role'    => ['id' => $role->id, 'name' => $role->name],
+        ], 201);
+    }
+
+    public function update(Request $request, Role $role)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+        ]);
+
+        $role->update(['name' => $validated['name']]);
+
+        return response()->json([
+            'message' => 'Role updated successfully',
+            'role'    => ['id' => $role->id, 'name' => $role->name],
+        ]);
+    }
+
+    public function destroy(Role $role)
+    {
+        $role->delete();
+
+        return response()->json(['message' => 'Role deleted successfully']);
     }
 
     public function data(Request $request)
