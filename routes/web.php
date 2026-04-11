@@ -44,12 +44,19 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::controller(RolesPermissionController::class)->group(function () {
-        Route::get('/roles-permissions', 'index')->name('roles-permissions.index'); // Inertia page
-        Route::get('/api/roles-permissions', 'data')->name('roles-permissions.data'); // AJAX data endpoint
+        Route::get('/roles-permissions', 'index')->name('roles-permissions.index');
+        Route::get('/api/roles-permissions', 'data')->name('roles-permissions.data');
+        // Flat lists for the assign modal (must be before /{role} routes)
+        Route::get('/api/roles-permissions/all-permissions', 'allPermissions')->name('roles-permissions.all-permissions');
+        Route::get('/api/roles-permissions/all-roles', 'allRoles')->name('roles-permissions.all-roles');
+        // CRUD
+        Route::put('/api/roles-permissions/{role}', 'syncPermissions')->name('roles-permissions.sync');
+        Route::delete('/api/roles-permissions/{role}', 'destroy')->name('roles-permissions.destroy');
     });
 
     Route::controller(UserController::class)->group(function () {
         Route::get('/users', 'index')->name('users.index'); // Inertia page
+        Route::get('/api/users', 'data')->name('users.data'); // Bootstrap Table endpoint
         Route::post('/users/table', 'table')->name('users.table');
         // Route::match(['get','post'], '/users', 'index')->name('users.index');
         // Route::get('/api/users', 'data')->name('users.data'); // AJAX data endpoint

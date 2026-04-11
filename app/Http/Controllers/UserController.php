@@ -232,6 +232,61 @@ $query->where(function ($q) use ($global) {
         ]);
     }
 
+    /** Bootstrap Table endpoint – GET /api/users */
+    public function data(Request $request)
+    {
+        $limit  = max(1, min((int) $request->input('limit', 10), 100));
+        $offset = (int) $request->input('offset', 0);
+        $order  = in_array(strtolower($request->input('order', 'desc')), ['asc', 'desc'])
+                    ? strtolower($request->input('order', 'desc'))
+                    : 'desc';
+        $sort   = $request->input('sort', 'id');
+        $search = $request->input('search');
+
+        $sortMap = [
+            'id'          => 'users.id',
+            'name'        => 'users.name',
+            'email'       => 'users.email',
+            'status_name' => 'global_statuses.name',
+        ];
+        $sortCol = $sortMap[$sort] ?? 'users.id';
+
+        $query = User::query()
+            ->leftJoin('global_statuses', 'users.status_id', '=', 'global_statuses.id')
+            ->select([
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.status_id',
+                'global_statuses.name  as status_name',
+                'global_statuses.color as status_color',
+            ]);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('users.name',  'like', "%{$search}%")
+                  ->orWhere('users.email', 'like', "%{$search}%")
+                  ->orWhere('global_statuses.name', 'like', "%{$search}%");
+            });
+        }
+
+        $query->orderBy($sortCol, $order);
+
+        $total = $query->count();
+        $rows  = $query->offset($offset)->limit($limit)->get()
+            ->map(fn($u) => [
+                'id'           => $u->id,
+                'name'         => $u->name,
+                'email'        => $u->email,
+                'status_id'    => $u->status_id,
+                'status_name'  => $u->status_name  ?? '',
+                'status_color' => $u->status_color ?? '',
+            ])
+            ->values();
+
+        return response()->json(['total' => $total, 'rows' => $rows]);
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([

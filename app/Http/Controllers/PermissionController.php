@@ -76,8 +76,6 @@ class PermissionController extends Controller
     {
         try {
             $permission->delete();
-
-            return back()->with('success', 'Permission updated successfully.');
             
             return response()->json([
                 'success' => true,
