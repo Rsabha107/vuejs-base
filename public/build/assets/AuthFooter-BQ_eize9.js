@@ -1,1 +1,0 @@
-import{G as e,H as t,S as n,j as r,w as i,y as a}from"./app-DyQKYbX5.js";var o={__name:`AuthFooter`,setup(o){let s=new Date().getFullYear();return(o,c)=>(r(),n(`p`,null,[i(` RS© `+e(t(s))+` Skote. Crafted with `,1),c[0]||=a(`i`,{class:`mdi mdi-heart text-danger`},null,-1),c[1]||=i(` by Themesbrand `,-1)]))}};export{o as t};

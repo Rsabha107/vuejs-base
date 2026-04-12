@@ -10,7 +10,7 @@ class Event extends Model
 {
     use HasFactory;
     protected $table = 'events';
-    protected $fillable = ['name', 'active_flag'];
+    protected $fillable = ['name', 'active_flag', 'event_logo'];
 
     // protected static function booted(){
     //     appLog(auth()->user()->functional_area_id);
@@ -29,18 +29,6 @@ class Event extends Model
     public function getOpenAttribute()
     {
         return true;
-    }
-
-
-    public function documents()
-    {
-        return $this->hasMany(EventDocument::class);
-    }
-
-    public function qidDocuments()
-    {
-        return $this->hasMany(EventDocument::class)
-            ->where('category', 'qid');
     }
 
     public function active_status()

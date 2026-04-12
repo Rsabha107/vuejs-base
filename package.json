@@ -29,12 +29,16 @@
         "apexcharts": "^5.10.4",
         "bootstrap": "^5.3.8",
         "bootstrap-table": "^1.27.0",
+        "filepond": "^4.32.12",
+        "filepond-plugin-file-validate-type": "^1.2.9",
+        "filepond-plugin-image-preview": "^4.6.12",
         "jquery": "^4.0.0",
         "node-waves": "^0.7.6",
         "primeicons": "^7.0.0",
         "primevue": "^4.5.4",
         "sweetalert2": "^11.26.24",
         "toastr": "^2.1.4",
+        "vue-filepond": "^7.0.4",
         "wave-ui": "^3.25.6"
     }
 }

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -143,94 +144,97 @@ class UserController extends Controller
         ]);
     }
 
-    public function table(Request $request)
-    {
-        Log::info('users.table request', [
-            'sort_field' => $request->input('sort_field'),
-            'sort_order' => $request->input('sort_order'),
-            'all' => $request->all(),
-        ]);
+    // public function table(Request $request)
+    // {
+    //     // Log::info('users.table request', [
+    //     //     'sort_field' => $request->input('sort_field'),
+    //     //     'sort_order' => $request->input('sort_order'),
+    //     //     'all' => $request->all(),
+    //     // ]);
 
-        $perPage = (int) $request->input('per_page', 10);
-        $page = (int) $request->input('page', 1);
+    //     $perPage = (int) $request->input('per_page', 10);
+    //     $page = (int) $request->input('page', 1);
 
-        $sortField = $request->input('sort_field', 'id');
-        $sortOrder = strtolower($request->input('sort_order', 'desc')) === 'asc' ? 'asc' : 'desc';
+    //     $sortField = $request->input('sort_field', 'id');
+    //     $sortOrder = strtolower($request->input('sort_order', 'desc')) === 'asc' ? 'asc' : 'desc';
 
-        $filters = json_decode($request->input('filters', '{}'), true) ?? [];
+    //     $filters = json_decode($request->input('filters', '{}'), true) ?? [];
 
-        // $query = User::query()->select([
-        //     'id',
-        //     'name',
-        //     'email',
-        //     'status_id',
-        // ]);
+    //     // $query = User::query()->select([
+    //     //     'id',
+    //     //     'name',
+    //     //     'email',
+    //     //     'status_id',
+    //     // ]);
 
-        $query = User::query()
-            ->leftJoin('global_statuses', 'users.status_id', '=', 'global_statuses.id')
-            ->select([
-                'users.id',
-                'users.name',
-                'users.email',
-                'users.status_id',
-                'global_statuses.name as status_name',
-                'global_statuses.color as status_color',
-            ]);
+    //     $query = User::query()
+    //         ->leftJoin('global_statuses', 'users.status_id', '=', 'global_statuses.id')
+    //         ->select([
+    //             'users.id',
+    //             'users.name',
+    //             'users.email',
+    //             'users.status_id',
+    //             'global_statuses.name as status_name',
+    //             'global_statuses.color as status_color',
+    //             'users.created_at',
+    //             'users.updated_at',
 
-        // 🔍 Global search
-        $global = data_get($filters, 'global.value');
-        if (!empty($global)) {
-$query->where(function ($q) use ($global) {
-    $q->where('users.id', 'like', "%{$global}%")
-      ->orWhere('users.name', 'like', "%{$global}%")
-      ->orWhere('users.email', 'like', "%{$global}%")
-      ->orWhere('users.status_id', 'like', "%{$global}%")
-      ->orWhere('global_statuses.name', 'like', "%{$global}%");
-});
-        }
+    //         ]);
 
-        // 📌 Column filters
-        if ($name = data_get($filters, 'name.constraints.0.value')) {
-            $query->where('users.name', 'like', "%{$name}%");
-        }
+    //     // 🔍 Global search
+    //     $global = data_get($filters, 'global.value');
+    //     if (!empty($global)) {
+    //         $query->where(function ($q) use ($global) {
+    //             $q->where('users.id', 'like', "%{$global}%")
+    //                 ->orWhere('users.name', 'like', "%{$global}%")
+    //                 ->orWhere('users.email', 'like', "%{$global}%")
+    //                 ->orWhere('users.status_id', 'like', "%{$global}%")
+    //                 ->orWhere('global_statuses.name', 'like', "%{$global}%");
+    //         });
+    //     }
 
-        if ($email = data_get($filters, 'email.constraints.0.value')) {
-            $query->where('users.email', 'like', "%{$email}%");
-        }
+    //     // 📌 Column filters
+    //     if ($name = data_get($filters, 'name.constraints.0.value')) {
+    //         $query->where('users.name', 'like', "%{$name}%");
+    //     }
 
-        $statusFilter = data_get($filters, 'status_id.constraints.0.value');
-        if (is_array($statusFilter) && count($statusFilter)) {
-            $query->whereIn('users.status_id', $statusFilter);
-        } elseif ($statusFilter !== null && $statusFilter !== '') {
-            $query->where('users.status_id', $statusFilter);
-        }
+    //     if ($email = data_get($filters, 'email.constraints.0.value')) {
+    //         $query->where('users.email', 'like', "%{$email}%");
+    //     }
 
-        // 🛡️ Safe sorting — map frontend field names to qualified column names
-        $sortFieldMap = [
-            'id'        => 'users.id',
-            'name'      => 'users.name',
-            'email'     => 'users.email',
-            'status_id' => 'users.status_id',
-        ];
+    //     $statusFilter = data_get($filters, 'status_id.constraints.0.value');
+    //     if (is_array($statusFilter) && count($statusFilter)) {
+    //         $query->whereIn('users.status_id', $statusFilter);
+    //     } elseif ($statusFilter !== null && $statusFilter !== '') {
+    //         $query->where('users.status_id', $statusFilter);
+    //     }
 
-        $sortField = $sortFieldMap[$sortField] ?? 'users.id';
+    //     // 🛡️ Safe sorting — map frontend field names to qualified column names
+    //     $sortFieldMap = [
+    //         'id'        => 'users.id',
+    //         'name'      => 'users.name',
+    //         'email'     => 'users.email',
+    //         'status_id' => 'users.status_id',
+    //     ];
 
-        $query->orderBy($sortField, $sortOrder);
+    //     $sortField = $sortFieldMap[$sortField] ?? 'users.id';
 
-        $users = $query->paginate($perPage, ['*'], 'page', $page);
+    //     $query->orderBy($sortField, $sortOrder);
 
-        return response()->json([
-            'data' => $users->items(),
-            'total' => $users->total(),
-            'lazyParams' => [
-                'page' => $users->currentPage(),
-                'rows' => $users->perPage(),
-                'sortField' => $sortField,
-                'sortOrder' => $sortOrder === 'asc' ? 1 : -1,
-                'filters' => $filters,
-            ],
-        ]);
-    }
+    //     $users = $query->paginate($perPage, ['*'], 'page', $page);
+
+    //     return response()->json([
+    //         'data' => $users->items(),
+    //         'total' => $users->total(),
+    //         'lazyParams' => [
+    //             'page' => $users->currentPage(),
+    //             'rows' => $users->perPage(),
+    //             'sortField' => $sortField,
+    //             'sortOrder' => $sortOrder === 'asc' ? 1 : -1,
+    //             'filters' => $filters,
+    //         ],
+    //     ]);
+    // }
 
     /** Bootstrap Table endpoint – GET /api/users */
     public function data(Request $request)
@@ -238,8 +242,8 @@ $query->where(function ($q) use ($global) {
         $limit  = max(1, min((int) $request->input('limit', 10), 100));
         $offset = (int) $request->input('offset', 0);
         $order  = in_array(strtolower($request->input('order', 'desc')), ['asc', 'desc'])
-                    ? strtolower($request->input('order', 'desc'))
-                    : 'desc';
+            ? strtolower($request->input('order', 'desc'))
+            : 'desc';
         $sort   = $request->input('sort', 'id');
         $search = $request->input('search');
 
@@ -248,6 +252,9 @@ $query->where(function ($q) use ($global) {
             'name'        => 'users.name',
             'email'       => 'users.email',
             'status_name' => 'global_statuses.name',
+            'created_at'  => 'users.created_at',
+            'updated_at'  => 'users.updated_at',
+
         ];
         $sortCol = $sortMap[$sort] ?? 'users.id';
 
@@ -260,14 +267,16 @@ $query->where(function ($q) use ($global) {
                 'users.status_id',
                 'global_statuses.name  as status_name',
                 'global_statuses.color as status_color',
+                'users.created_at',
+                'users.updated_at',
             ])
             ->with('roles:id,name');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('users.name',  'like', "%{$search}%")
-                  ->orWhere('users.email', 'like', "%{$search}%")
-                  ->orWhere('global_statuses.name', 'like', "%{$search}%");
+                    ->orWhere('users.email', 'like', "%{$search}%")
+                    ->orWhere('global_statuses.name', 'like', "%{$search}%");
             });
         }
 
@@ -282,6 +291,8 @@ $query->where(function ($q) use ($global) {
                 'status_id'    => $u->status_id,
                 'status_name'  => $u->status_name  ?? '',
                 'status_color' => $u->status_color ?? '',
+                'created_at'   => $u->created_at?->format('Y-m-d'),
+                'updated_at'   => $u->updated_at?->format('Y-m-d'),
                 'roles'        => $u->roles->map(fn($r) => ['id' => $r->id, 'name' => $r->name])->values(),
             ])
             ->values();
@@ -299,47 +310,60 @@ $query->where(function ($q) use ($global) {
         $data = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:6'],
+            'password' => ['required',  Password::defaults()],
             'status_id' => ['required', 'exists:global_statuses,id'],
             'role_ids' => ['nullable', 'array'],
             'role_ids.*' => ['integer', 'exists:roles,id'],
         ]);
 
-        $data['password'] = bcrypt($data['password']);
-        $roleIds = $data['role_ids'] ?? [];
-        unset($data['role_ids']);
+        try {
+            $data['password'] = bcrypt($data['password']);
+            $roleIds = $data['role_ids'] ?? [];
+            unset($data['role_ids']);
 
-        $user = User::create($data);
-        $user->syncRoles($roleIds);
+            $user = User::create($data);
+            $user->syncRoles($roleIds);
+            $user->touch();
 
-        return back()->with('success', 'User created successfully.');
+            return back()->with('success', 'User created successfully.');
+        } catch (\Throwable $e) {
+            Log::error('Failed to create user', ['error' => $e->getMessage()]);
+
+            return back()->withErrors(['general' => 'Failed to create user. Please try again.']);
+        }
     }
 
     public function update(Request $request, User $user)
     {
-        Log::info("Updating user ID {$user->id}", ['request' => $request->all()]);
         $data = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => ['nullable', 'string', 'min:6'],
-            'status_id' => ['required', 'exists:global_statuses,id'],
-            'role_ids' => ['nullable', 'array'],
+            'name'       => ['required', 'string', 'max:255'],
+            'email'      => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password'   => ['nullable', 'string', 'min:6'],
+            'status_id'  => ['required', 'exists:global_statuses,id'],
+            'role_ids'   => ['nullable', 'array'],
             'role_ids.*' => ['integer', 'exists:roles,id'],
         ]);
 
-        if (!empty($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
+        try {
+            if (!empty($data['password'])) {
+                $data['password'] = bcrypt($data['password']);
+            } else {
+                unset($data['password']);
+            }
+
+            $roleIds = $data['role_ids'] ?? [];
+            unset($data['role_ids']);
+
+            $user->update($data);
+            $user->syncRoles($roleIds);
+            $user->touch();
+
+            return back()->with('success', 'User updated successfully.');
+        } catch (\Throwable $e) {
+            Log::error("Failed to update user ID {$user->id}", ['error' => $e->getMessage()]);
+
+            return back()->withErrors(['general' => 'Failed to update user. Please try again.']);
         }
-
-        $roleIds = $data['role_ids'] ?? [];
-        unset($data['role_ids']);
-
-        $user->update($data);
-        $user->syncRoles($roleIds);
-
-        return back()->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)

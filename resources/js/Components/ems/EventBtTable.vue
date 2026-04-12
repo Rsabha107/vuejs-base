@@ -24,6 +24,11 @@ const showModal = ref(false);
 const modalMode = ref("create");
 const selectedEvent = ref(null);
 
+// Returns a fixed height on desktop; undefined on mobile (Bootstrap Table ignores undefined)
+function getTableHeight() {
+  return window.innerWidth < 768 ? undefined : Math.max(300, window.innerHeight - 210);
+}
+
 // ── Formatters ────────────────────────────────────────────────────
 function logoFormatter(_value, row) {
   if (!row.logo_url) {
@@ -42,6 +47,14 @@ function statusFormatter(_value, row) {
   return `<span class="ev-status-badge ${cls}">${row.status_name}</span>`;
 }
 
+function venuesFormatter(_value, row) {
+  const venues = row.venues ?? [];
+  if (!venues.length) return '<span class="text-muted">—</span>';
+  return venues
+    .map((v) => `<span class="ev-venue-badge">${v.title}</span>`)
+    .join(" ");
+}
+
 function actionFormatter(_value, row) {
   return `
     <div class="d-flex gap-1 justify-content-center">
@@ -49,6 +62,9 @@ function actionFormatter(_value, row) {
               data-id="${row.id}"
               data-name="${row.name}"
               data-flag="${row.active_flag}"
+              data-logo="${row.logo_url ?? ''}"
+              data-event-logo="${row.event_logo ?? ''}"
+              data-venue-ids="${JSON.stringify(row.venue_ids ?? [])}"
               title="Edit">
         <i class="fa fa-pencil-alt"></i>
       </button>
@@ -75,6 +91,7 @@ function initTable() {
     sidePagination: "server",
     search: true,
     showRefresh: true,
+    height: getTableHeight(),
     showToggle: true,
     showColumns: true,
     sortName: "id",
@@ -133,10 +150,27 @@ function initTable() {
         formatter: statusFormatter,
       },
       {
+        field: "venues",
+        title: "Venues",
+        sortable: false,
+        searchable: false,
+        switchable: true,
+        formatter: venuesFormatter,
+      },
+      {
         field: "created_at",
         title: "Created",
         sortable: true,
         switchable: true,
+        visible: false,
+        formatter: (v) => v ?? "—",
+      },
+      {
+        field: "updated_at",
+        title: "Updated",
+        sortable: true,
+        switchable: true,
+        visible: false,
         formatter: (v) => v ?? "—",
       },
       {
@@ -154,10 +188,15 @@ function initTable() {
 
   $table.on("click", ".bt-edit-btn", function () {
     const $btn = $(this);
+    let venueIds = [];
+    try { venueIds = JSON.parse($btn.attr("data-venue-ids") || "[]"); } catch (_) {}
     openEditModal({
-      id: parseInt($btn.data("id")),
-      name: String($btn.data("name")),
+      id:          parseInt($btn.data("id")),
+      name:        String($btn.data("name")),
       active_flag: $btn.data("flag") ?? "",
+      logo_url:    $btn.data("logo") ?? null,
+      event_logo:  $btn.data("event-logo") ?? null,
+      venue_ids:   venueIds,
     });
   });
 
@@ -512,6 +551,19 @@ onBeforeUnmount(() => {
   color: #dc2626;
 }
 :deep(.bt-delete-btn:hover) { background: #ffe4e6; }
+
+:deep(.ev-venue-badge) {
+  display: inline-block;
+  background: #eef2ff;
+  color: #3a5bd9;
+  border: 1px solid #c7d2fe;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  margin: 1px 2px;
+  white-space: nowrap;
+}
 
 :deep(.ev-status-badge) {
   display: inline-flex;

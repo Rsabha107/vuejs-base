@@ -121,7 +121,7 @@ import { Head, Link } from "@inertiajs/vue3";
           </ul>
         </li>
 
-                <!-- security -->
+        <!-- security -->
         <li class="menu-title" key="t-ems">EMS</li>
         <li>
           <a class="has-arrow waves-effect" href="javascript: void(0);">
@@ -130,9 +130,10 @@ import { Head, Link } from "@inertiajs/vue3";
           </a>
           <ul aria-expanded="false" class="sub-menu">
             <li>
-              <Link :href="route('events.index')" key="t-events">
-                Events
-              </Link>
+              <Link :href="route('events.index')" key="t-events"> Events </Link>
+            </li>
+            <li>
+              <Link :href="route('venues.index')" key="t-venues"> Venues </Link>
             </li>
           </ul>
         </li>
@@ -154,7 +155,12 @@ import { Head, Link } from "@inertiajs/vue3";
               <Link :href="route('roles.index')" key="t-roles"> Roles </Link>
             </li>
             <li>
-              <Link :href="route('roles-permissions.index')" key="t-roles-permissions"> Roles & Permissions </Link>
+              <Link
+                :href="route('roles-permissions.index')"
+                key="t-roles-permissions"
+              >
+                Roles & Permissions
+              </Link>
             </li>
             <li>
               <Link :href="route('mylogin')" key="t-login"> Login </Link>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Ems\EventController;
+use App\Http\Controllers\Ems\VenueController;
 use App\Http\Controllers\GlobalStatusController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
@@ -49,8 +50,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/events', 'data')->name('events.data');
         Route::post('/events', 'store')->name('events.store');
         Route::get('/events/{event}', 'show')->name('events.show');
-        Route::put('/events/{event}', 'update')->name('events.update');
+        Route::match(['put', 'post'], '/events/{event}', 'update')->name('events.update');
         Route::delete('/events/{event}', 'destroy')->name('events.destroy');
+    });
+
+    Route::controller(VenueController::class)->group(function () {
+        Route::get('/venues', 'index')->name('venues.index');
+        Route::get('/api/venues', 'data')->name('venues.data');
+        Route::get('/api/venues/all', 'all')->name('venues.all');
+        Route::post('/venues', 'store')->name('venues.store');
+        Route::get('/venues/{venue}', 'show')->name('venues.show');
+        Route::match(['put', 'post'], '/venues/{venue}', 'update')->name('venues.update');
+        Route::delete('/venues/{venue}', 'destroy')->name('venues.destroy');
     });
 
     Route::controller(RolesPermissionController::class)->group(function () {
@@ -67,7 +78,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(UserController::class)->group(function () {
         Route::get('/users', 'index')->name('users.index'); // Inertia page
         Route::get('/api/users', 'data')->name('users.data'); // Bootstrap Table endpoint
-        Route::post('/users/table', 'table')->name('users.table');
+        // Route::post('/users/table', 'table')->name('users.table');
         // Route::match(['get','post'], '/users', 'index')->name('users.index');
         // Route::get('/api/users', 'data')->name('users.data'); // AJAX data endpoint
 

@@ -24,6 +24,11 @@ const modalMode = ref("create"); // "create" | "edit"
 const selectedRoleId = ref(null);
 const selectedRoleName = ref("");
 
+// Returns a fixed height on desktop; undefined on mobile (Bootstrap Table ignores undefined)
+function getTableHeight() {
+  return window.innerWidth < 768 ? undefined : Math.max(300, window.innerHeight - 210);
+}
+
 // ── Action column HTML ────────────────────────────────────────────
 function actionFormatter(_value, row) {
   return `
@@ -65,6 +70,7 @@ function initTable() {
     search: true,
     showRefresh: true,
     showToggle: true,
+    height: getTableHeight(),
     showColumns: true,
     sortName: "id",
     sortOrder: "asc",

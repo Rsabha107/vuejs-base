@@ -22,6 +22,11 @@ const modalMode = ref("create");
 const selectedRoleId = ref(null);
 const selectedRoleName = ref("");
 
+// Returns a fixed height on desktop; undefined on mobile (Bootstrap Table ignores undefined)
+function getTableHeight() {
+  return window.innerWidth < 768 ? undefined : Math.max(300, window.innerHeight - 210);
+}
+
 // ── Action column HTML ────────────────────────────────────────────
 function actionFormatter(value, row) {
   return `
@@ -58,6 +63,7 @@ function initTable() {
     search: true,
     checkboxHeader: true,
     clickToSelect: true,
+    height: getTableHeight(),
     showRefresh: true,
     showColumns: true,
     showToggle: true,

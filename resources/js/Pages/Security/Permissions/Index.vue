@@ -35,11 +35,11 @@ defineProps({
     <div class="main-content">
       <div class="page-content">
         <div class="container-fluid">
-          <div class="card">
-            <div class="card-body">
+          <!-- <div class="card">
+            <div class="card-body"> -->
               <PermissionBtTable :rows="permissions" />
-            </div>
-          </div>
+            <!-- </div>
+          </div> -->
         </div>
       </div>
       <!-- end modal -->

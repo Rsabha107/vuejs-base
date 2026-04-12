@@ -31,6 +31,12 @@ const items = ref([
   { label: "User Management", url: "/users", icon: "pi pi-users" },
 ]);
 
+// Returns a fixed height on desktop; undefined on mobile (Bootstrap Table ignores undefined)
+function getTableHeight() {
+  return window.innerWidth < 768 ? undefined : Math.max(300, window.innerHeight - 210);
+}
+
+
 // ── Formatters ───────────────────────────────────────────────────
 function statusFormatter(_value, row) {
   if (!row.status_name) return '<span class="text-muted">—</span>';
@@ -82,6 +88,7 @@ function initTable() {
     sidePagination: "server",
     search: true,
     checkboxHeader: true,
+    height: getTableHeight(),
     clickToSelect: true,
     showRefresh: true,
     showColumns: true,
@@ -155,6 +162,22 @@ function initTable() {
         searchable: false,
         switchable: true,
         formatter: rolesFormatter,
+      },
+            {
+        field: "created_at",
+        title: "Created",
+        sortable: true,
+        switchable: true,
+        visible: false,
+        formatter: (v) => v ?? "—",
+      },
+      {
+        field: "updated_at",
+        title: "Updated",
+        sortable: true,
+        switchable: true,
+        visible: false,
+        formatter: (v) => v ?? "—",
       },
       {
         field: "actions",

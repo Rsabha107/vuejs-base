@@ -17,22 +17,22 @@ import { Link } from "@inertiajs/vue3";
     <div class="d-flex">
       <!-- LOGO -->
       <div class="navbar-brand-box">
-        <a class="logo logo-dark" href="index.html">
+        <Link class="logo logo-dark" :href="route('home')">
           <span class="logo-sm">
             <img alt="" height="22" src="/assets/images/logo.svg" />
           </span>
           <span class="logo-lg">
             <img alt="" height="17" src="/assets/images/logo-dark.png" />
           </span>
-        </a>
-        <a class="logo logo-light" href="index.html">
+        </Link>
+        <Link class="logo logo-light" :href="route('home')">
           <span class="logo-sm">
             <img alt="" height="22" src="/assets/images/logo-light.svg" />
           </span>
           <span class="logo-lg">
             <img alt="" height="19" src="/assets/images/users/sparkle_hrms.jpg" />
           </span>
-        </a>
+        </Link>
       </div>
       <button
         class="btn btn-sm text-white px-3 font-size-16 header-item waves-effect"
