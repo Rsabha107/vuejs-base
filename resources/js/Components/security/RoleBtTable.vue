@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import $ from "jquery";
-import axios from "axios";
 import Breadcrumb from "primevue/breadcrumb";
 import Swal from "sweetalert2";
+import RoleFormModal from "./RoleFormModal.vue";
 
 // ── Table ref ────────────────────────────────────────────────────
 const tableRef = ref(null);
@@ -20,9 +20,7 @@ const items = ref([{ label: "Roles", url: "/roles", icon: "pi pi-users" }]);
 const showModal = ref(false);
 const modalMode = ref("create");
 const selectedRoleId = ref(null);
-const form = ref({ name: "" });
-const formErrors = ref({});
-const isSaving = ref(false);
+const selectedRoleName = ref("");
 
 // ── Action column HTML ────────────────────────────────────────────
 function actionFormatter(value, row) {
@@ -151,50 +149,19 @@ function refreshTable() {
 function openCreateModal() {
   modalMode.value = "create";
   selectedRoleId.value = null;
-  form.value = { name: "" };
-  formErrors.value = {};
+  selectedRoleName.value = "";
   showModal.value = true;
 }
 
 function openEditModal(role) {
   modalMode.value = "edit";
   selectedRoleId.value = role.id;
-  form.value = { name: role.name };
-  formErrors.value = {};
+  selectedRoleName.value = role.name;
   showModal.value = true;
 }
 
 function closeModal() {
   showModal.value = false;
-  formErrors.value = {};
-}
-
-async function saveRole() {
-  formErrors.value = {};
-  if (!form.value.name.trim()) {
-    formErrors.value = { name: "Role name is required." };
-    return;
-  }
-  isSaving.value = true;
-  try {
-    if (modalMode.value === "create") {
-      await axios.post("/roles", { name: form.value.name });
-      window.toastr?.success("Role created successfully");
-    } else {
-      await axios.put(`/roles/${selectedRoleId.value}`, {
-        name: form.value.name,
-      });
-      window.toastr?.success("Role updated successfully");
-    }
-    closeModal();
-    refreshTable();
-  } catch (err) {
-    const errors = err.response?.data?.errors;
-    if (errors) formErrors.value = errors;
-    else window.toastr?.error("An error occurred. Please try again.");
-  } finally {
-    isSaving.value = false;
-  }
 }
 
 async function confirmDeleteRole(role) {
@@ -249,55 +216,14 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- ── Role Modal ─────────────────────────────────────────────── -->
-  <Teleport to="body">
-    <div v-if="showModal" class="role-modal-overlay" @click.self="closeModal">
-      <div class="role-modal-box">
-        <div class="role-modal-header">
-          <h5 class="role-modal-title">
-            {{ modalMode === "create" ? "Add Role" : "Edit Role" }}
-          </h5>
-          <button class="btn-close" @click="closeModal"></button>
-        </div>
-
-        <div class="role-modal-body">
-          <label class="form-label fw-semibold" for="role-name-input">
-            Role Name
-          </label>
-          <input
-            id="role-name-input"
-            v-model="form.name"
-            type="text"
-            class="form-control"
-            :class="{ 'is-invalid': formErrors.name }"
-            placeholder="Enter role name"
-            @keydown.enter="saveRole"
-          />
-          <div v-if="formErrors.name" class="invalid-feedback">
-            {{
-              Array.isArray(formErrors.name)
-                ? formErrors.name[0]
-                : formErrors.name
-            }}
-          </div>
-        </div>
-
-        <div class="role-modal-footer">
-          <button class="btn btn-light" @click="closeModal">Cancel</button>
-          <button
-            class="btn btn-primary"
-            :disabled="isSaving"
-            @click="saveRole"
-          >
-            <span
-              v-if="isSaving"
-              class="spinner-border spinner-border-sm me-1"
-            ></span>
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-  </Teleport>
+  <RoleFormModal
+    :show="showModal"
+    :mode="modalMode"
+    :role-id="selectedRoleId"
+    :role-name="selectedRoleName"
+    @close="closeModal"
+    @saved="refreshTable"
+  />
 </template>
 
 <style scoped>
@@ -604,54 +530,6 @@ onBeforeUnmount(() => {
 }
 :deep(.bt-delete-btn:hover) {
   background: #ffe4e6;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Modal
-═══════════════════════════════════════════════════════════════ */
-.role-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.role-modal-box {
-  background: #fff;
-  border-radius: 18px;
-  width: 440px;
-  max-width: 95vw;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
-}
-
-.role-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #eaecf6;
-}
-
-.role-modal-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.role-modal-body {
-  padding: 1.25rem;
-}
-
-.role-modal-footer {
-  padding: 1rem 1.25rem;
-  border-top: 1px solid #eaecf6;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════

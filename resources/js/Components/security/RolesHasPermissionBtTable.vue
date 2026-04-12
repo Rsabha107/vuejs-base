@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
+import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import $ from "jquery";
 import axios from "axios";
 import Breadcrumb from "primevue/breadcrumb";
 import Swal from "sweetalert2";
+import RolesPermissionFormModal from "./RolesPermissionFormModal.vue";
 
 // ── Table ref ────────────────────────────────────────────────────
 const tableRef = ref(null);
@@ -20,28 +21,8 @@ const items = ref([
 // ── Modal state ──────────────────────────────────────────────────
 const showModal = ref(false);
 const modalMode = ref("create"); // "create" | "edit"
-const isSaving = ref(false);
-const isLoadingModal = ref(false);
-
-const form = ref({
-  role_id: "",
-  role_name: "",
-  permission_ids: [],
-});
-const formErrors = ref({});
-
-// ── Data for modal dropdowns ──────────────────────────────────────
-const allRoles = ref([]);
-const allPermissions = ref([]);
-const permSearch = ref("");
-
-const filteredPermissions = computed(() =>
-  permSearch.value.trim()
-    ? allPermissions.value.filter((p) =>
-        p.name.toLowerCase().includes(permSearch.value.toLowerCase())
-      )
-    : allPermissions.value
-);
+const selectedRoleId = ref(null);
+const selectedRoleName = ref("");
 
 // ── Action column HTML ────────────────────────────────────────────
 function actionFormatter(_value, row) {
@@ -138,10 +119,10 @@ function initTable() {
   });
 
   // Edit → open assign modal pre-filled with role's current permissions
-  $table.on("click", ".bt-edit-btn", async function () {
+  $table.on("click", ".bt-edit-btn", function () {
     const id = parseInt($(this).data("id"));
     const name = String($(this).data("name"));
-    await openEditModal(id, name);
+    openEditModal(id, name);
   });
 
   // Delete → confirm then destroy
@@ -158,80 +139,23 @@ function refreshTable() {
   $(tableRef.value).bootstrapTable("refresh");
 }
 
-// ── Load dropdown data ────────────────────────────────────────────
-async function loadModalData() {
-  if (allPermissions.value.length && allRoles.value.length) return; // cached
-
-  const [permsRes, rolesRes] = await Promise.all([
-    axios.get("/api/roles-permissions/all-permissions"),
-    axios.get("/api/roles-permissions/all-roles"),
-  ]);
-  allPermissions.value = permsRes.data;
-  allRoles.value = rolesRes.data;
-}
-
 // ── Modal helpers ─────────────────────────────────────────────────
-async function openCreateModal() {
-  isLoadingModal.value = true;
-  await loadModalData();
-  isLoadingModal.value = false;
-
+function openCreateModal() {
   modalMode.value = "create";
-  permSearch.value = "";
-  form.value = { role_id: "", role_name: "", permission_ids: [] };
-  formErrors.value = {};
+  selectedRoleId.value = null;
+  selectedRoleName.value = "";
   showModal.value = true;
 }
 
-async function openEditModal(id, name) {
-  isLoadingModal.value = true;
-  await loadModalData();
-
-  // Fetch current permission IDs for this role
-  const { data } = await axios.get(
-    `/api/roles-permissions?limit=1&offset=0&search=${encodeURIComponent(name)}`
-  );
-  const row = data.rows?.find((r) => r.id === id);
-  const currentPermIds = row ? row.permissions.map((p) => p.id) : [];
-
-  isLoadingModal.value = false;
-
+function openEditModal(id, name) {
   modalMode.value = "edit";
-  permSearch.value = "";
-  form.value = { role_id: id, role_name: name, permission_ids: currentPermIds };
-  formErrors.value = {};
+  selectedRoleId.value = id;
+  selectedRoleName.value = name;
   showModal.value = true;
 }
 
 function closeModal() {
   showModal.value = false;
-  formErrors.value = {};
-}
-
-// ── Save ──────────────────────────────────────────────────────────
-async function saveAssignment() {
-  formErrors.value = {};
-
-  if (modalMode.value === "create" && !form.value.role_id) {
-    formErrors.value.role_id = "Please select a role.";
-    return;
-  }
-
-  isSaving.value = true;
-  try {
-    await axios.put(`/api/roles-permissions/${form.value.role_id}`, {
-      permission_ids: form.value.permission_ids,
-    });
-    window.toastr?.success("Permissions saved successfully");
-    closeModal();
-    refreshTable();
-  } catch (err) {
-    const errors = err.response?.data?.errors;
-    if (errors) formErrors.value = errors;
-    else window.toastr?.error("An error occurred. Please try again.");
-  } finally {
-    isSaving.value = false;
-  }
 }
 
 // ── Delete ────────────────────────────────────────────────────────
@@ -277,16 +201,8 @@ onBeforeUnmount(() => {
   <div class="bt-outer">
     <!-- Left toolbar pill injected by Bootstrap Table -->
     <div id="rp-left-toolbar" style="display: block">
-      <button
-        class="bt-pill-btn"
-        :disabled="isLoadingModal"
-        @click="openCreateModal"
-      >
-        <span
-          v-if="isLoadingModal"
-          class="spinner-border spinner-border-sm me-1"
-        ></span>
-        <i v-else class="fa fa-key me-1"></i>
+      <button class="bt-pill-btn" @click="openCreateModal">
+        <i class="fa fa-key me-1"></i>
         Assign Permissions to Role
       </button>
     </div>
@@ -295,119 +211,14 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- ── Assign / Edit Modal ────────────────────────────────────── -->
-  <Teleport to="body">
-    <div v-if="showModal" class="rp-modal-overlay" @click.self="closeModal">
-      <div class="rp-modal-box">
-        <!-- Header -->
-        <div class="rp-modal-header">
-          <h5 class="rp-modal-title">
-            <i class="fa fa-key me-2 text-primary"></i>
-            {{
-              modalMode === "create"
-                ? "Assign Permissions to Role"
-                : "Edit Role Permissions"
-            }}
-          </h5>
-          <button class="btn-close" @click="closeModal"></button>
-        </div>
-
-        <!-- Body -->
-        <div class="rp-modal-body">
-          <!-- Role selector (create mode) -->
-          <div v-if="modalMode === 'create'" class="mb-4">
-            <label class="form-label fw-semibold">Role</label>
-            <select
-              v-model="form.role_id"
-              class="form-select"
-              :class="{ 'is-invalid': formErrors.role_id }"
-            >
-              <option value="">Select a role…</option>
-              <option v-for="role in allRoles" :key="role.id" :value="role.id">
-                {{ role.name }}
-              </option>
-            </select>
-            <div v-if="formErrors.role_id" class="invalid-feedback">
-              {{ formErrors.role_id }}
-            </div>
-          </div>
-
-          <!-- Role label (edit mode) -->
-          <div v-else class="mb-4">
-            <label class="form-label fw-semibold">Role</label>
-            <div class="role-label">{{ form.role_name }}</div>
-          </div>
-
-          <!-- Permissions -->
-          <div>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <label class="form-label fw-semibold mb-0">
-                Permissions
-                <span class="badge-count"
-                  >{{ form.permission_ids.length }} selected</span
-                >
-              </label>
-              <button
-                type="button"
-                class="btn btn-link btn-sm p-0 text-muted text-decoration-none"
-                @click="form.permission_ids = []"
-              >
-                Clear all
-              </button>
-            </div>
-
-            <!-- Search -->
-            <input
-              v-model="permSearch"
-              type="text"
-              class="form-control form-control-sm mb-2"
-              placeholder="Search permissions…"
-            />
-
-            <!-- Checkbox list -->
-            <div class="perm-list">
-              <label
-                v-for="perm in filteredPermissions"
-                :key="perm.id"
-                class="perm-check-item"
-                :class="{ 'is-checked': form.permission_ids.includes(perm.id) }"
-              >
-                <input
-                  type="checkbox"
-                  :value="perm.id"
-                  v-model="form.permission_ids"
-                  class="perm-checkbox"
-                />
-                <span>{{ perm.name }}</span>
-              </label>
-
-              <div
-                v-if="filteredPermissions.length === 0"
-                class="text-muted small py-3 text-center"
-              >
-                No permissions found.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="rp-modal-footer">
-          <button class="btn btn-light" @click="closeModal">Cancel</button>
-          <button
-            class="btn btn-primary"
-            :disabled="isSaving"
-            @click="saveAssignment"
-          >
-            <span
-              v-if="isSaving"
-              class="spinner-border spinner-border-sm me-1"
-            ></span>
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-  </Teleport>
+  <RolesPermissionFormModal
+    :show="showModal"
+    :mode="modalMode"
+    :role-id="selectedRoleId"
+    :role-name="selectedRoleName"
+    @close="closeModal"
+    @saved="refreshTable"
+  />
 </template>
 
 <style scoped>
@@ -715,131 +526,6 @@ onBeforeUnmount(() => {
 }
 :deep(.bt-delete-btn:hover) {
   background: #ffe4e6;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Modal
-═══════════════════════════════════════════════════════════════ */
-.rp-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.rp-modal-box {
-  background: #fff;
-  border-radius: 18px;
-  width: 520px;
-  max-width: 95vw;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
-}
-
-.rp-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #eaecf6;
-  flex-shrink: 0;
-}
-
-.rp-modal-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.rp-modal-body {
-  padding: 1.25rem;
-  overflow-y: auto;
-  flex: 1 1 auto;
-}
-
-.rp-modal-footer {
-  padding: 1rem 1.25rem;
-  border-top: 1px solid #eaecf6;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-/* Role label in edit mode */
-.role-label {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1f2937;
-  background: #f5f7ff;
-  border: 1px solid #c7d2fe;
-  border-radius: 10px;
-  padding: 8px 14px;
-  display: inline-block;
-}
-
-/* Selected count badge */
-.badge-count {
-  display: inline-block;
-  background: #eef2ff;
-  color: #3a5bd9;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 50px;
-  padding: 1px 8px;
-  margin-left: 6px;
-}
-
-/* Scrollable permissions list */
-.perm-list {
-  max-height: 280px;
-  overflow-y: auto;
-  border: 1px solid #eaecf6;
-  border-radius: 12px;
-  padding: 6px 4px;
-}
-
-.perm-check-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.12s;
-  font-size: 13px;
-  color: #374151;
-  user-select: none;
-}
-
-.perm-check-item:hover {
-  background: #f5f7ff;
-}
-
-.perm-check-item.is-checked {
-  background: #eef2ff;
-  color: #3a5bd9;
-  font-weight: 500;
-}
-
-.perm-checkbox {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  border-color: #5b8df6;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.perm-checkbox:checked {
-  background-color: #3a5bd9;
-  border-color: #3a5bd9;
 }
 
 /* ═══════════════════════════════════════════════════════════════

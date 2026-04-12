@@ -96,23 +96,21 @@ function submit() {
 </script>
 
 <template>
-  <div
-    v-if="show"
-    class="modal fade show"
-    style="display: block; background: rgba(0, 0, 0, 0.4)"
-    tabindex="-1"
-    aria-modal="true"
-    role="dialog"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form @submit.prevent="submit">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ title }}</h5>
-            <button type="button" class="btn-close" @click="closeModal"></button>
-          </div>
+  <Teleport to="body">
+    <div v-if="show" class="rp-modal-overlay" @click.self="closeModal">
+      <div class="rp-modal-box">
+        <!-- Header -->
+        <div class="rp-modal-header">
+          <h5 class="rp-modal-title">
+            <i class="fa fa-user me-2 text-primary"></i>
+            {{ isEdit ? "Edit Permission" : "Add Permission" }}
+          </h5>
+          <button class="btn-close" @click="closeModal"></button>
+        </div>
 
-          <div class="modal-body">
+        <!-- Body -->
+        <div class="rp-modal-body">
+          <form id="permission-form" @submit.prevent="submit">
             <div class="mb-3">
               <label class="form-label" for="permission-name">Name</label>
               <input
@@ -127,18 +125,81 @@ function submit() {
                 {{ errors.name }}
               </div>
             </div>
-          </div>
+          </form>
+        </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="closeModal">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ submitText }}
-            </button>
-          </div>
-        </form>
+        <!-- Footer -->
+        <div class="rp-modal-footer">
+          <button type="button" class="btn btn-light" @click="closeModal">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="permission-form"
+            class="btn btn-primary"
+            :disabled="saving"
+          >
+            {{ submitText }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
+
+<style scoped>
+/* ═══════════════════════════════════════════════════════════════
+   Modal
+═══════════════════════════════════════════════════════════════ */
+.rp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rp-modal-box {
+  background: #fff;
+  border-radius: 18px;
+  width: 520px;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+}
+
+.rp-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #eaecf6;
+  flex-shrink: 0;
+}
+
+.rp-modal-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.rp-modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.rp-modal-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #eaecf6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+</style>
