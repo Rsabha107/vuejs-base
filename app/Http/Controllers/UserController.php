@@ -260,7 +260,8 @@ $query->where(function ($q) use ($global) {
                 'users.status_id',
                 'global_statuses.name  as status_name',
                 'global_statuses.color as status_color',
-            ]);
+            ])
+            ->with('roles:id,name');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -281,26 +282,35 @@ $query->where(function ($q) use ($global) {
                 'status_id'    => $u->status_id,
                 'status_name'  => $u->status_name  ?? '',
                 'status_color' => $u->status_color ?? '',
+                'roles'        => $u->roles->map(fn($r) => ['id' => $r->id, 'name' => $r->name])->values(),
             ])
             ->values();
 
         return response()->json(['total' => $total, 'rows' => $rows]);
     }
 
+    public function roles(User $user)
+    {
+        return response()->json($user->roles->pluck('id'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6'],
             'status_id' => ['required', 'exists:global_statuses,id'],
+            'role_ids' => ['nullable', 'array'],
+            'role_ids.*' => ['integer', 'exists:roles,id'],
         ]);
 
         $data['password'] = bcrypt($data['password']);
-        // $data['country'] = $data['country'] ?? 'Qatar';
-        $data['status_id'] = $data['status_id'] ?? '';
+        $roleIds = $data['role_ids'] ?? [];
+        unset($data['role_ids']);
 
-        User::create($data);
+        $user = User::create($data);
+        $user->syncRoles($roleIds);
 
         return back()->with('success', 'User created successfully.');
     }
@@ -309,10 +319,12 @@ $query->where(function ($q) use ($global) {
     {
         Log::info("Updating user ID {$user->id}", ['request' => $request->all()]);
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:6'],
             'status_id' => ['required', 'exists:global_statuses,id'],
+            'role_ids' => ['nullable', 'array'],
+            'role_ids.*' => ['integer', 'exists:roles,id'],
         ]);
 
         if (!empty($data['password'])) {
@@ -321,8 +333,11 @@ $query->where(function ($q) use ($global) {
             unset($data['password']);
         }
 
-        Log::debug("Updating user with data", ['data' => $data]);
+        $roleIds = $data['role_ids'] ?? [];
+        unset($data['role_ids']);
+
         $user->update($data);
+        $user->syncRoles($roleIds);
 
         return back()->with('success', 'User updated successfully.');
     }

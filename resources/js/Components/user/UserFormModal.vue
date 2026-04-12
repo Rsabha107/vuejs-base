@@ -6,20 +6,14 @@ import axios from "axios";
 import UserFormFields from "@/Components/forms/UserFormFields.vue";
 
 const statuses = ref([]);
+const allRoles = ref([]);
+const roleSearch = ref("");
+const isLoadingRoles = ref(false);
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  mode: {
-    type: String,
-    default: "create",
-  },
-  user: {
-    type: Object,
-    default: null,
-  },
+  show: { type: Boolean, default: false },
+  mode: { type: String, default: "create" },
+  user: { type: Object, default: null },
 });
 
 const emit = defineEmits(["close", "saved"]);
@@ -32,7 +26,16 @@ const form = useForm({
   email: "",
   password: "",
   status_id: "",
+  role_ids: [],
 });
+
+const filteredRoles = computed(() =>
+  roleSearch.value.trim()
+    ? allRoles.value.filter((r) =>
+        r.name.toLowerCase().includes(roleSearch.value.toLowerCase())
+      )
+    : allRoles.value
+);
 
 async function loadStatuses() {
   try {
@@ -43,21 +46,46 @@ async function loadStatuses() {
   }
 }
 
+async function loadRoles() {
+  if (allRoles.value.length) return;
+  try {
+    const res = await axios.get("/api/roles-permissions/all-roles");
+    allRoles.value = res.data ?? [];
+  } catch (e) {
+    console.error("Failed to load roles", e);
+  }
+}
+
 onMounted(() => {
   loadStatuses();
+  loadRoles();
 });
 
 watch(
   () => [props.show, props.user, props.mode],
-  () => {
+  async () => {
     form.clearErrors();
     form.reset();
+    roleSearch.value = "";
 
     form.id = props.user?.id ?? null;
     form.name = props.user?.name ?? "";
     form.email = props.user?.email ?? "";
     form.password = "";
     form.status_id = isEdit.value ? Number(props.user?.status_id ?? "") : "";
+    form.role_ids = [];
+
+    if (isEdit.value && props.user?.id) {
+      isLoadingRoles.value = true;
+      try {
+        const res = await axios.get(route("users.roles", props.user.id));
+        form.role_ids = res.data ?? [];
+      } catch (e) {
+        console.error("Failed to load user roles", e);
+      } finally {
+        isLoadingRoles.value = false;
+      }
+    }
   },
   { immediate: true }
 );
@@ -108,6 +136,62 @@ function submit() {
               :statuses="statuses"
               :is-edit="isEdit"
             />
+
+            <!-- Roles -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label fw-semibold mb-0">
+                  Roles
+                  <span class="badge-count">{{ form.role_ids.length }} selected</span>
+                </label>
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm p-0 text-muted text-decoration-none"
+                  @click="form.role_ids = []"
+                >
+                  Clear all
+                </button>
+              </div>
+
+              <input
+                v-model="roleSearch"
+                type="text"
+                class="form-control form-control-sm mb-2"
+                placeholder="Search roles…"
+              />
+
+              <div class="role-list">
+                <div v-if="isLoadingRoles" class="text-center py-3">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                </div>
+                <template v-else>
+                  <label
+                    v-for="role in filteredRoles"
+                    :key="role.id"
+                    class="role-check-item"
+                    :class="{ 'is-checked': form.role_ids.includes(role.id) }"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="role.id"
+                      v-model="form.role_ids"
+                      class="role-checkbox"
+                    />
+                    <span>{{ role.name }}</span>
+                  </label>
+                  <div
+                    v-if="filteredRoles.length === 0"
+                    class="text-muted small py-3 text-center"
+                  >
+                    No roles found.
+                  </div>
+                </template>
+              </div>
+
+              <div v-if="form.errors.role_ids" class="text-danger small mt-1">
+                {{ form.errors.role_ids }}
+              </div>
+            </div>
           </form>
         </div>
 
@@ -135,9 +219,6 @@ function submit() {
 </template>
 
 <style scoped>
-/* ═══════════════════════════════════════════════════════════════
-   Modal
-═══════════════════════════════════════════════════════════════ */
 .rp-modal-overlay {
   position: fixed;
   inset: 0;
@@ -188,5 +269,61 @@ function submit() {
   justify-content: flex-end;
   gap: 0.5rem;
   flex-shrink: 0;
+}
+
+.badge-count {
+  display: inline-block;
+  background: #eef2ff;
+  color: #3a5bd9;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 50px;
+  padding: 1px 8px;
+  margin-left: 6px;
+}
+
+.role-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #eaecf6;
+  border-radius: 12px;
+  padding: 6px 4px;
+}
+
+.role-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  font-size: 13px;
+  color: #374151;
+  user-select: none;
+}
+
+.role-check-item:hover {
+  background: #f5f7ff;
+}
+
+.role-check-item.is-checked {
+  background: #eef2ff;
+  color: #3a5bd9;
+  font-weight: 500;
+}
+
+.role-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border-color: #5b8df6;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.role-checkbox:checked {
+  background-color: #3a5bd9;
+  border-color: #3a5bd9;
 }
 </style>

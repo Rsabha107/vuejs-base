@@ -10,6 +10,7 @@ class Event extends Model
 {
     use HasFactory;
     protected $table = 'events';
+    protected $fillable = ['name', 'active_flag'];
 
     // protected static function booted(){
     //     appLog(auth()->user()->functional_area_id);

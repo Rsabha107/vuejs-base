@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
         // Route::get('/api/users', 'data')->name('users.data'); // AJAX data endpoint
 
         // Route::get('/users', 'index')->name('users.index');
+        Route::get('/api/users/{user}/roles', 'roles')->name('users.roles');
         Route::post('/users', 'store')->name('users.store');
         Route::put('/users/{user}', 'update')->name('users.update');
         Route::delete('/users/{user}', 'destroy')->name('users.destroy');
