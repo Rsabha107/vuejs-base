@@ -37,7 +37,6 @@ defineProps({
         <div class="container-fluid">
           <div class="card">
             <div class="card-body">
-              <h4 class="mb-3">Permissions</h4>
               <PermissionBtTable :rows="permissions" />
             </div>
           </div>

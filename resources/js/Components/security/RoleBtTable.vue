@@ -2,10 +2,19 @@
 import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import $ from "jquery";
 import axios from "axios";
+import Breadcrumb from "primevue/breadcrumb";
 import Swal from "sweetalert2";
 
 // ── Table ref ────────────────────────────────────────────────────
 const tableRef = ref(null);
+
+// ── Breadcrumb data ─────────────────────────────────────────────
+const home = ref({
+  icon: "pi pi-home",
+  url: route("home"),
+});
+
+const items = ref([{ label: "Roles", url: "/roles", icon: "pi pi-users" }]);
 
 // ── Modal state ──────────────────────────────────────────────────
 const showModal = ref(false);
@@ -224,6 +233,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <div class="d-flex align-items-center gap-2 flex-wrap mb-4">
+    <Breadcrumb :home="home" :model="items" />
+  </div>
   <div class="bt-outer">
     <!--
           Bootstrap Table picks up #roles-left-toolbar and injects it

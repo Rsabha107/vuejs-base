@@ -15,9 +15,9 @@ Route::inertia('MyAuth/Login', 'MyAuth/Login')->name('mylogin');
 Route::inertia('MyAuth/Register', 'MyAuth/Register')->name('myregister');
 Route::inertia('MyAuth/ForgotPassword', 'MyAuth/ForgotPassword')->name('myforgotpassword');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
 
