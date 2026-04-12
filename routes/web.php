@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Ems\EventController;
 use App\Http\Controllers\GlobalStatusController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
@@ -43,6 +44,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/permissions/{permission}', 'destroy')->name('permissions.destroy');
     });
 
+    Route::controller(EventController::class)->group(function () {
+        Route::get('/events', 'index')->name('events.index');
+        Route::get('/api/events', 'data')->name('events.data');
+        Route::post('/events', 'store')->name('events.store');
+        Route::get('/events/{event}', 'show')->name('events.show');
+        Route::put('/events/{event}', 'update')->name('events.update');
+        Route::delete('/events/{event}', 'destroy')->name('events.destroy');
+    });
+
     Route::controller(RolesPermissionController::class)->group(function () {
         Route::get('/roles-permissions', 'index')->name('roles-permissions.index');
         Route::get('/api/roles-permissions', 'data')->name('roles-permissions.data');
@@ -65,7 +75,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/users', 'store')->name('users.store');
         Route::put('/users/{user}', 'update')->name('users.update');
         Route::delete('/users/{user}', 'destroy')->name('users.destroy');
-
     });
 
     Route::controller(RoleController::class)->group(function () {

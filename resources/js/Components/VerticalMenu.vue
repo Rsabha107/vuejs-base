@@ -121,6 +121,22 @@ import { Head, Link } from "@inertiajs/vue3";
           </ul>
         </li>
 
+                <!-- security -->
+        <li class="menu-title" key="t-ems">EMS</li>
+        <li>
+          <a class="has-arrow waves-effect" href="javascript: void(0);">
+            <i class="bx bx-cog"> </i>
+            <span key="t-dashboards"> Setting </span>
+          </a>
+          <ul aria-expanded="false" class="sub-menu">
+            <li>
+              <Link :href="route('events.index')" key="t-events">
+                Events
+              </Link>
+            </li>
+          </ul>
+        </li>
+
         <!-- security -->
         <li class="menu-title" key="t-menu">Security/Privacy</li>
         <li>

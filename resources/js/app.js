@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-table/dist/bootstrap-table.min.css";
-import 'bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.css';
+// import 'bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.css';
 
 import "../../public/assets/css/app.min.css";
 import "primeicons/primeicons.css";
@@ -12,7 +12,7 @@ import $ from "jquery";
 window.$ = window.jQuery = $;
 
 import "bootstrap-table/dist/bootstrap-table.min.js";
-import 'bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js';
+// import 'bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js';
 
 import Waves from "node-waves";
 import "node-waves/dist/waves.min.css";
@@ -25,8 +25,6 @@ window.toastr = toastr;
 import PrimeVue from "primevue/config";
 import { definePreset } from "@primeuix/themes";
 import Aura from "@primeuix/themes/aura";
-
-const MyPreset = definePreset(Aura);
 
 const MyTheme = definePreset(Aura, {
     semantic: {

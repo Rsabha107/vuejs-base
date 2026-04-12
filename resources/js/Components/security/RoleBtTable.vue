@@ -63,7 +63,6 @@ function initTable() {
     showRefresh: true,
     showColumns: true,
     showToggle: true,
-    filterControl: false,
     sortName: "id",
     sortOrder: "desc",
     pageList: [5, 10, 25, 50],
