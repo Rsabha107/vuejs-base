@@ -283,14 +283,14 @@ onBeforeUnmount(() => {
   border: 1px solid #dde3f0;
 }
 
-:deep(.fixed-table-toolbar) {
+/* :deep(.fixed-table-toolbar) {
   background: linear-gradient(135deg, #1f326e 0%, #043399 55%, #1f326e 100%);
   padding: 14px 20px;
   display: flex !important;
   align-items: center;
   gap: 12px;
   flex-wrap: nowrap;
-}
+} */
 
 :deep(.fixed-table-toolbar .bars) {
   order: 1;
@@ -480,12 +480,12 @@ onBeforeUnmount(() => {
   transition: background 0.15s;
 }
 
-:deep(.fixed-table-pagination .pagination .page-item.active .page-link) {
+/* :deep(.fixed-table-pagination .pagination .page-item.active .page-link) {
   background: #3a5bd9 !important;
   color: #fff !important;
   border-radius: 50% !important;
   border: none;
-}
+} */
 
 :deep(
     .fixed-table-pagination .pagination .page-item:hover:not(.active) .page-link

@@ -248,15 +248,16 @@ onBeforeUnmount(() => {
 /* ═══════════════════════════════════════════════════════════════
    Toolbar – gradient header
 ═══════════════════════════════════════════════════════════════ */
-:deep(.fixed-table-toolbar) {
-  background: linear-gradient(135deg, #1f326e 0%, #043399 55%, #1f326e 100%);
+/* :deep(.fixed-table-toolbar) {
+  background: linear-gradient(135deg, #ec9674 0%, #ec9674 55%, #ec9674 100%); */
+  /* background: linear-gradient(135deg, #1f326e 0%, #043399 55%, #1f326e 100%); */
   /* background: linear-gradient(135deg, #3a5bd9 0%, #5b8df6 55%, #7ec8f8 100%); */
-  padding: 14px 20px;
+  /* padding: 14px 20px;
   display: flex !important;
   align-items: center;
   gap: 12px;
   flex-wrap: nowrap;
-}
+} */
 
 /* Left: "Add Permission" pill */
 :deep(.fixed-table-toolbar .bars) {
@@ -446,7 +447,7 @@ onBeforeUnmount(() => {
   border-top: 1px solid #eaecf6;
 }
 
-:deep(.fixed-table-pagination .pagination .page-link) {
+/* :deep(.fixed-table-pagination .pagination .page-link) {
   border: none;
   border-radius: 50% !important;
   width: 32px;
@@ -460,7 +461,7 @@ onBeforeUnmount(() => {
   background: transparent;
   margin: 0 2px;
   transition: background 0.15s;
-}
+} */
 
 :deep(.fixed-table-pagination .pagination .page-item.active .page-link) {
   background: #3a5bd9 !important;

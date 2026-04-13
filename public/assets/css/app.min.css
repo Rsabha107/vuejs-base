@@ -11,25 +11,26 @@
     border-bottom: 1px solid var(--bs-border-color);
 } */
 
-#page-topbar {
+/* #page-topbar {
     position: fixed;
     top: 0;
     right: 0;
     left: 0;
-    z-index: 1002;
+    z-index: 1002; */
 
-    background: #1f326e;
+    /* background: #1f326e; */
+    /* background: rgba(85, 110, 230, 0.70); */
     /* background: 
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
         url('/assets/img/background/wo_logo/P3-P4-P5-P6_1920x1080_pxl.png'); */
 
-    background-size: cover;
+    /* background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
 
     box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
     border-bottom: 1px solid var(--bs-border-color);
-}
+} */
 
 /* #page-topbar,
 #page-topbar * {
@@ -648,8 +649,8 @@ body[data-sidebar="dark"] .vertical-menu {
     background: #2a3042;
 }
 
-body[data-sidebar="dark"] .vertical-menu {
-  background: #1f326e
+body[data-sidebar="light"] .vertical-menu {
+  background: #fff
 }
 
 body[data-sidebar="dark"] #sidebar-menu ul li a {

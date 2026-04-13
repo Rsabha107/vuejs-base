@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Ems\EventController;
+use App\Http\Controllers\Ems\FunctionalAreaController;
 use App\Http\Controllers\Ems\VenueController;
 use App\Http\Controllers\GlobalStatusController;
 use App\Http\Controllers\ProfileController;
@@ -62,6 +63,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/venues/{venue}', 'show')->name('venues.show');
         Route::match(['put', 'post'], '/venues/{venue}', 'update')->name('venues.update');
         Route::delete('/venues/{venue}', 'destroy')->name('venues.destroy');
+    });
+
+    Route::controller(FunctionalAreaController::class)->group(function () {
+        Route::get('/functional-areas', 'index')->name('functional-areas.index');
+        Route::get('/api/functional-areas', 'data')->name('functional-areas.data');
+        Route::get('/api/functional-areas/all', 'all')->name('functional-areas.all');
+        Route::post('/functional-areas', 'store')->name('functional-areas.store');
+        Route::get('/functional-areas/{functionalArea}', 'show')->name('functional-areas.show');
+        Route::match(['put', 'post'], '/functional-areas/{functionalArea}', 'update')->name('functional-areas.update');
+        Route::delete('/functional-areas/{functionalArea}', 'destroy')->name('functional-areas.destroy');
     });
 
     Route::controller(RolesPermissionController::class)->group(function () {

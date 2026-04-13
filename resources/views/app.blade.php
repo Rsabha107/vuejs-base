@@ -29,7 +29,7 @@
     @inertiaHead
 </head>
 
-<body data-sidebar="dark">
+<body data-sidebar="light">
     @inertia
 
 </body>

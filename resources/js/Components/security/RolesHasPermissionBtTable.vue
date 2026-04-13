@@ -256,15 +256,15 @@ onBeforeUnmount(() => {
 /* ═══════════════════════════════════════════════════════════════
    Toolbar – gradient header
 ═══════════════════════════════════════════════════════════════ */
-:deep(.fixed-table-toolbar) {
+/* :deep(.fixed-table-toolbar) { */
   /* background: linear-gradient(135deg, #3a5bd9 0%, #5b8df6 55%, #7ec8f8 100%); */
-  background: linear-gradient(135deg, #1f326e 0%, #043399 55%, #1f326e 100%);
+  /* background: linear-gradient(135deg, #1f326e 0%, #043399 55%, #1f326e 100%);
   padding: 14px 20px;
   display: flex !important;
   align-items: center;
   gap: 12px;
   flex-wrap: nowrap;
-}
+} */
 
 :deep(.fixed-table-toolbar .bars) {
   order: 1;
