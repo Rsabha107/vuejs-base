@@ -2,11 +2,20 @@
 import { useForm } from "@inertiajs/vue3";
 import { Head, Link } from "@inertiajs/vue3";
 
-const props = defineProps({ status: String });
+const props = defineProps({
+  token: String,
+  email: String,
+})
 
-const form = useForm({ email: "" });
+const form = useForm({
+  token: props.token,
+  email: props.email,
+  password: '',
+  password_confirmation: '',
+}).dontRemember('password', 'password_confirmation')
 
-const submit = () => form.post("/forgot-password");
+
+const submit = () => form.post("/reset-password");
 </script>
 
 <template>
@@ -54,18 +63,46 @@ const submit = () => form.post("/forgot-password");
                 </div> -->
                 <!-- <form action="index.html" class="form-horizontal"> -->
                 <form @submit.prevent="submit">
+                  <div v-if="form.errors.email" class="alert alert-danger" role="alert">
+                    {{ form.errors.email }}
+                  </div>
                   <div class="mb-3">
                     <label class="form-label" for="useremail"> Email </label>
                     <input
                       v-model="form.email"
-                      class="form-control"
+                      :class="['form-control', { 'is-invalid': form.errors.email }]"
                       id="useremail"
                       placeholder="Enter email"
                       type="email"
                       required
                     />
                   </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="userpassword"> Password </label>
+                    <input
+                      v-model="form.password"
+                      :class="['form-control', { 'is-invalid': form.errors.password }]"
+                      id="userpassword"
+                      placeholder="Enter password"
+                      type="password"
+                      required
+                    />
+                    <div v-if="form.errors.password" class="invalid-feedback">{{ form.errors.password }}</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="userpassword_confirmation"> Confirm Password </label>
+                    <input
+                      v-model="form.password_confirmation"
+                      :class="['form-control', { 'is-invalid': form.errors.password_confirmation }]"
+                      id="userpassword_confirmation"
+                      placeholder="Enter password confirmation"
+                      type="password"
+                      required
+                    />
+                    <div v-if="form.errors.password_confirmation" class="invalid-feedback">{{ form.errors.password_confirmation }}</div>
+                  </div>
                   <div class="text-end">
+                                        
                     <button
                       class="btn btn-primary w-md waves-effect waves-light"
                       type="submit"
@@ -77,7 +114,7 @@ const submit = () => form.post("/forgot-password");
                         role="status"
                         aria-hidden="true"
                       ></span>
-                      {{ form.processing ? 'Sending...' : 'Send Reset Link' }}
+                      {{ form.processing ? 'Resetting...' : 'Reset Password' }}
                     </button>
                   </div>
                 </form>

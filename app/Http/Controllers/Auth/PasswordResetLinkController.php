@@ -3,9 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendForgotPasswordMail;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,24 +35,77 @@ class PasswordResetLinkController extends Controller
      * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
+    // {
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //     ]);
+
+    //     // We will send the password reset link to this user. Once we have attempted
+    //     // to send the link, we will examine the response then see the message we
+    //     // need to show to the user. Finally, we'll send out a proper response.
+    //     $status = Password::sendResetLink(
+    //         $request->only('email')
+    //     );
+
+    //     if ($status == Password::RESET_LINK_SENT) {
+    //         return back()->with('status', __($status));
+    //     }
+
+    //     throw ValidationException::withMessages([
+    //         'email' => [trans($status)],
+    //     ]);
+    // }
+
     {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
+        Log::debug('PasswordResetLinkController@store called with email: ' . $request->email);  
+        $rules = [
+            'email' => 'required|email|exists:users',
+        ];
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $validator = Validator::make($request->all(), $rules);
 
-        if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+        Log::debug('Validation rules applied: ' . json_encode($rules));
+        if ($validator->fails()) {
+            Log::debug('Validation failed for email: ' . $request->email . ' with errors: ' . json_encode($validator->errors()->all()));
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($validator);
         }
 
-        throw ValidationException::withMessages([
-            'email' => [trans($status)],
-        ]);
-    }
+        $token = sha1(time() . config('global.key'));
+
+        Log::debug('Generated password reset token: ' . $token);
+        try {
+            Log::debug('Attempting to insert password reset token into database for email: ' . $request->email);
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $request->email],
+                ['token' => $token, 'created_at' => Carbon::now()]
+            );
+            Log::debug('Password reset token inserted into database for email: ' . $request->email);
+
+        } catch (Exception $e) {
+            Log::debug('Error inserting password reset token into database for email: ' . $request->email . ' with error: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->withErrors('A reset password was already sent to your email.  please check your inbox');
+            // return $e->getMessage();
+        }
+
+        $content = [
+            'token'     => $token,
+            'subject'   => 'V: Reset Password Link',
+            // 'url'       => route('password.reset', ['token' => $token]),
+        ];
+
+        Log::debug('Prepared email content for password reset: ' . json_encode($content));
+        Mail::to($request->email)->queue(new SendForgotPasswordMail($content));
+
+        // Mail::send('emails.forgetPassword', ['token' => $token], function($message) use($request){
+        //     $message->to($request->email);
+        //     $message->subject('Reset Password');
+        // });
+
+        return back()->with('message', 'We have e-mailed your password reset link!');
+    } //submitForgetPasswordForm
+
 }

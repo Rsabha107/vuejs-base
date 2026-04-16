@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -39,14 +42,34 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request): RedirectResponse|HttpResponse
     {
-        Auth::guard('web')->logout();
+        // Log::info('AuthenticatedSessionController:destroy: session before logout: ' . json_encode($request->session()->all()));
 
-        $request->session()->invalidate();
 
-        $request->session()->regenerateToken();
+        if (session('login_method') === 'microsoft') {
+            /** @var \SocialiteProviders\Microsoft\Provider $microsoft */
+            // first log out of Laravel session, then redirect to Microsoft logout URL
+            Auth::guard('web')->logout();
 
-        return redirect('/');
+            $request->session()->invalidate();
+
+            $request->session()->regenerateToken();
+
+            // now redirect to Microsoft logout URL which will then redirect back to our login page
+            $microsoft = Socialite::driver('microsoft');
+            $microsoftLogoutUrl = $microsoft->getLogoutUrl(route('mylogin'));
+            // Log::info('AuthenticatedSessionController:destroy microsoftLogoutUrl: ' . $microsoftLogoutUrl);
+            return Inertia::location($microsoftLogoutUrl);
+        } else {
+
+            Auth::guard('web')->logout();
+
+            $request->session()->invalidate();
+
+            $request->session()->regenerateToken();
+
+            return redirect('/');
+        }
     }
 }

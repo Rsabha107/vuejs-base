@@ -128,6 +128,22 @@ const currentYear = new Date().getFullYear();
                   novalidate
                 >
                   <div
+                    v-if="status"
+                    class="alert alert-success"
+                    role="alert"
+                  >
+                    {{ status }}
+                  </div>
+
+                  <div
+                    v-if="$page.props.flash?.error"
+                    class="alert alert-danger"
+                    role="alert"
+                  >
+                    {{ $page.props.flash.error }}
+                  </div>
+
+                  <div
                     v-if="form.errors.email"
                     class="alert alert-danger"
                     role="alert"
@@ -206,6 +222,16 @@ const currentYear = new Date().getFullYear();
                           href="javascript::void()"
                         >
                           <i class="mdi mdi-google"> </i>
+                        </a>
+                      </li>
+                      <li class="list-inline-item">
+                        <a
+                          class="social-list-item bg-primary text-white border-primary"
+                          href="/auth/microsoft/redirect"
+                          title="Sign in with Microsoft"
+                         
+                        >
+                          <i class="mdi mdi-microsoft-windows"></i>
                         </a>
                       </li>
                     </ul>

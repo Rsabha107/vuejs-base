@@ -28,14 +28,16 @@
     24 => 'Laravel\\Breeze\\BreezeServiceProvider',
     25 => 'Laravel\\Pail\\PailServiceProvider',
     26 => 'Laravel\\Sanctum\\SanctumServiceProvider',
-    27 => 'Laravel\\Tinker\\TinkerServiceProvider',
-    28 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
-    29 => 'Carbon\\Laravel\\ServiceProvider',
-    30 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    31 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    32 => 'Spatie\\Permission\\PermissionServiceProvider',
-    33 => 'Tighten\\Ziggy\\ZiggyServiceProvider',
-    34 => 'App\\Providers\\AppServiceProvider',
+    27 => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    28 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    29 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
+    30 => 'Carbon\\Laravel\\ServiceProvider',
+    31 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    32 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    33 => 'SocialiteProviders\\Manager\\ServiceProvider',
+    34 => 'Spatie\\Permission\\PermissionServiceProvider',
+    35 => 'Tighten\\Ziggy\\ZiggyServiceProvider',
+    36 => 'App\\Providers\\AppServiceProvider',
   ),
   'eager' => 
   array (
@@ -220,6 +222,7 @@
     'validation.presence' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'Illuminate\\Contracts\\Validation\\UncompromisedVerifier' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'Laravel\\Breeze\\Console\\InstallCommand' => 'Laravel\\Breeze\\BreezeServiceProvider',
+    'Laravel\\Socialite\\Contracts\\Factory' => 'SocialiteProviders\\Manager\\ServiceProvider',
     'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
   ),
   'when' => 
@@ -266,7 +269,13 @@
     'Laravel\\Breeze\\BreezeServiceProvider' => 
     array (
     ),
+    'Laravel\\Socialite\\SocialiteServiceProvider' => 
+    array (
+    ),
     'Laravel\\Tinker\\TinkerServiceProvider' => 
+    array (
+    ),
+    'SocialiteProviders\\Manager\\ServiceProvider' => 
     array (
     ),
   ),

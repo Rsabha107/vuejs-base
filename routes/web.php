@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\MicrosoftController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Ems\EventController;
 use App\Http\Controllers\Ems\FunctionalAreaController;
 use App\Http\Controllers\Ems\VenueController;
@@ -18,6 +20,28 @@ Route::inertia('MyAuth/Login', 'MyAuth/Login')->name('mylogin');
 Route::inertia('MyAuth/Register', 'MyAuth/Register')->name('myregister');
 Route::inertia('MyAuth/ForgotPassword', 'MyAuth/ForgotPassword')->name('myforgotpassword');
 
+
+Route::controller(MicrosoftController::class)->group(function () {
+    Route::get('auth/microsoft/redirect', 'redirectToMicrosoft')->name('auth.microsoft');
+    Route::get('auth/microsoft/callback', 'handleMicrosoftCallback');
+});
+
+
+Route::get('password/confirmed', function () {
+    return Inertia::render('MyAuth/Confirmation', [
+        'icon'          => 'bx bx-check-circle',
+        'iconColor'     => 'text-success',
+        'title'         => 'Password Changed!',
+        'message'       => session('status'),
+        'buttonText'    => 'Sign In',
+        'buttonHref'    => route('mylogin'),
+        'buttonVariant' => 'primary',
+    ]);
+})->name('password.confirmed');
+
+// check email route
+// Route::get('/send-mail', [SendMailController::class, 'index']);
+
 // Route::get('/dashboard', function () {
 //     return Inertia::render('Dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
@@ -34,8 +58,9 @@ Route::middleware('auth')->group(function () {
     })->name('home');
 
     Route::get('/users/export', [UserExportController::class, 'export'])->name('users.export');
-
     Route::get('/statuses', [GlobalStatusController::class, 'getStatuses'])->name('global.statuses.get');
+
+    // Route::post('forget-password', [PasswordResetLinkController::class, 'submitForgetPasswordForm'])->name('forgot.password.post');
 
     Route::controller(PermissionController::class)->group(function () {
         Route::get('/permissions', 'index')->name('permissions.index');
