@@ -20,7 +20,6 @@ Route::inertia('MyAuth/Login', 'MyAuth/Login')->name('mylogin');
 Route::inertia('MyAuth/Register', 'MyAuth/Register')->name('myregister');
 Route::inertia('MyAuth/ForgotPassword', 'MyAuth/ForgotPassword')->name('myforgotpassword');
 
-
 Route::controller(MicrosoftController::class)->group(function () {
     Route::get('auth/microsoft/redirect', 'redirectToMicrosoft')->name('auth.microsoft');
     Route::get('auth/microsoft/callback', 'handleMicrosoftCallback');
