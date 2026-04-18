@@ -54,6 +54,30 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Validate credentials without logging in. Returns the user on success.
+     *
+     * @throws ValidationException
+     */
+    public function authenticateAndGetUser(): \App\Models\User
+    {
+        $this->ensureIsNotRateLimited();
+
+        $user = \App\Models\User::where('email', $this->string('email'))->first();
+
+        if (! $user || ! Auth::getProvider()->validateCredentials($user, ['password' => $this->string('password')])) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+        RateLimiter::clear($this->throttleKey());
+
+        return $user;
+    }
+
+    /**
      * Ensure the login request is not rate limited.
      *
      * @throws ValidationException

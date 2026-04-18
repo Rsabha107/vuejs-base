@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\MicrosoftController;
+use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Ems\EventController;
 use App\Http\Controllers\Ems\FunctionalAreaController;
@@ -19,6 +20,12 @@ use Inertia\Inertia;
 Route::inertia('MyAuth/Login', 'MyAuth/Login')->name('mylogin');
 Route::inertia('MyAuth/Register', 'MyAuth/Register')->name('myregister');
 Route::inertia('MyAuth/ForgotPassword', 'MyAuth/ForgotPassword')->name('myforgotpassword');
+
+Route::middleware('otp.pending')->group(function () {
+    Route::get('/otp', [OtpController::class, 'show'])->name('otp.show');
+    Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify');
+    Route::post('/otp/resend', [OtpController::class, 'resend'])->name('otp.resend');
+});
 
 Route::controller(MicrosoftController::class)->group(function () {
     Route::get('auth/microsoft/redirect', 'redirectToMicrosoft')->name('auth.microsoft');

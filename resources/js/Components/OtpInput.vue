@@ -68,7 +68,7 @@ defineExpose({ focus })
         :ref="el => inputs[index] = el"
         :value="digits[index]"
         :class="['form-control form-control-lg text-center fw-semibold fs-4', { 'is-invalid': hasError }]"
-        style="width: 56px; max-width: 56px;"
+        style="width: 56px; max-width: 56px; background-image: none; color: #212529; padding-right: 0.75rem;"
         maxlength="1"
         inputmode="numeric"
         autocomplete="one-time-code"

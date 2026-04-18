@@ -33,11 +33,14 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         try {
-            $request->authenticate();
- 
-            $request->session()->regenerate();
+            $user = $request->authenticateAndGetUser();
 
-            return redirect()->intended(route('mypage', absolute: false));
+            $request->session()->regenerate();
+            $request->session()->put('otp_user_id', $user->id);
+
+            $user->sendOneTimePassword();
+
+            return redirect()->route('otp.show');
         } catch (\Exception $e) {
             Log::error('AuthenticatedSessionController:store: Exception occurred', [
                 'message' => $e->getMessage(),

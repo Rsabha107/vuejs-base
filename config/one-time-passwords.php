@@ -3,7 +3,7 @@
 use Spatie\OneTimePasswords\Actions\ConsumeOneTimePasswordAction;
 use Spatie\OneTimePasswords\Actions\CreateOneTimePasswordAction;
 use Spatie\OneTimePasswords\Models\OneTimePassword;
-use Spatie\OneTimePasswords\Notifications\OneTimePasswordNotification;
+// use Spatie\OneTimePasswords\Notifications\OneTimePasswordNotification;
 use Spatie\OneTimePasswords\Support\OriginInspector\DefaultOriginEnforcer;
 use Spatie\OneTimePasswords\Support\PasswordGenerators\NumericOneTimePasswordGenerator;
 
@@ -68,7 +68,8 @@ return [
     /*
      * The notification used to send a one-time password to a user
      */
-    'notification' => OneTimePasswordNotification::class,
+       'notification' => \App\Notifications\OneTimePasswordNotification::class,
+    // 'notification' => OneTimePasswordNotification::class,
 
     /*
      * These class are responsible for performing core tasks regarding one-time passwords.

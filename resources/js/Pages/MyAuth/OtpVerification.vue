@@ -14,7 +14,9 @@ const form = useForm({ otp: '' })
 
 function submit() {
   if (form.otp.length < props.length) return
-  form.post(route('otp.verify'))
+  form.post(route('otp.verify'), {
+    onError: () => { form.otp = ''; otpInput.value?.focus() },
+  })
 }
 
 function resend() {
